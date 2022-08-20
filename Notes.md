@@ -5,8 +5,11 @@ Learning method based on maximizing imediate rewards attributed to actions.
 ### Rewards
 
 Eat apple = 10 p
-Die = -10 p
+Die = -10 p or #steps > 100 * len(snake) -10p 
+    | no progress proportional with the length of the snake
 Move without hitting the wall or diying = 0p
+
+
 
 ### Moves
 
