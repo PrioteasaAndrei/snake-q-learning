@@ -5,6 +5,8 @@ Q learning is trial and error.
 
 ## Agent
 
+The agent recieves the game as a parameter
+
 The agent can do:
     explotation = look into the Q table and select max value action
     exploration = act randomly -> explore new states
@@ -34,7 +36,15 @@ max Q(st+1, a) = maximum future reward than can be obtained from st+1
 
 Matrix of size(dim(state),dim(actions))
 
-For snake -> np.zeros((3,10)) ?? nu 10 cred ca cate patratele avem
+For snake -> np.zeros((3,sizeof(table))
+
+States : WIDTH = 640 / 20 = 32
+         HEIGHT = 480 / 20 = 24
+
+#states = 32 * 24 = 768
+
+qtable[i][j] = Q(i,j) i- state , j - where
+0 <= qtable[i][j] <= 1
 
 ### Rewards
 
@@ -42,6 +52,7 @@ Eat apple = 10 p
 Die = -10 p or #steps > 100 * len(snake) -10p 
     | no progress proportional with the length of the snake
 Move without hitting the wall or diying = 0p
+(i don't want the shortest path and don't want the snake to move forever to maximize reward)
 
 
 
@@ -58,3 +69,5 @@ moving_left,moving_right,moving_up,moving_down,
 food_left,food_right,food_up,food_down]
 
 -- all boolean
+
+
