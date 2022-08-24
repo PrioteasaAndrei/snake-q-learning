@@ -70,4 +70,17 @@ food_left,food_right,food_up,food_down]
 
 -- all boolean
 
+Varianta simpla : 
+    state = casuta in care se afla capul sarpelui
 
+Varianta complexa:
+    state = 
+            [danger_straight,danger_left,danger_right,
+            moving_left,moving_right,moving_up,moving_down,
+            food_left,food_right,food_up,food_down]
+
+
+
+## BUGS
+
+Cand da de marginea de sus creste in dimensiune aiurea ca si cum ar fi reward acolo

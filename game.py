@@ -27,7 +27,7 @@ BLACK = (0,0,0)
 GREEN = (75,224,80)
 
 BLOCK_SIZE = 20
-SPEED = 10
+SPEED = 40
 WINDOW_HEIGHT = 480
 WINDOW_WIDTH = 640
 
@@ -40,6 +40,7 @@ class SnakeGame:
         self.display = pygame.display.set_mode((self.w, self.h))
         pygame.display.set_caption('__snake__')
         self.clock = pygame.time.Clock()
+        self.games_played = 0
         self.reset()
 
     
@@ -56,12 +57,15 @@ class SnakeGame:
         self.food = None
         self._place_food()
         self.frame_iteration = 0
+        self.games_played += 1
 
         
     def _place_food(self):
         x = random.randint(0, (self.w-BLOCK_SIZE )//BLOCK_SIZE )*BLOCK_SIZE 
         y = random.randint(0, (self.h-BLOCK_SIZE )//BLOCK_SIZE )*BLOCK_SIZE
         self.food = Point(x, y)
+        ## SUNT INDEXATE DE LA 0 DAR X SI Y SUNT INVERS
+       
         if self.food in self.snake:
             self._place_food()
 
@@ -69,6 +73,7 @@ class SnakeGame:
         return self.food
         
     def play_step(self,action):
+
         self.frame_iteration+=1
         # 1. collect user input
         for event in pygame.event.get():
@@ -128,7 +133,9 @@ class SnakeGame:
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
         
         text = font.render("Score: " + str(self.score), True, WHITE)
+        games_played = font.render("Games played: " + str(self.games_played),True,WHITE)
         self.display.blit(text, [0, 0])
+        self.display.blit(games_played,[0,25])
         pygame.display.flip()
         
         

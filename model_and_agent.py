@@ -3,6 +3,20 @@ from multiprocessing.spawn import prepare
 import matplotlib.pyplot as plt
 import numpy as np
 from game import BLOCK_SIZE, SnakeGame
+from collections import namedtuple
+from enum import Enum
+import random
+
+from plotting import plot_score
+
+Point = namedtuple('Point', 'x, y')
+
+class Direction(Enum):
+    RIGHT = 1
+    LEFT = 2
+    UP = 3
+    DOWN = 4
+    
 
 def prepare_enviroment(game):
     snake = game._get_snake_idxs()
@@ -18,8 +32,10 @@ def prepare_enviroment(game):
     if apple[0] % BLOCK_SIZE != 0.0 or apple[1] % BLOCK_SIZE != 0.0:
         raise Exception()
 
+    ## 32 * 24 and 3 actions
     qtable = np.zeros((32,24,3))
     # qtable = np.zeros((768,3))
+    
     ## rewards
     ## bigger by 2 set the bounderies equal to -10
     rewards = np.zeros((32,24))
@@ -37,12 +53,19 @@ def prepare_enviroment(game):
     
     return qtable,rewards
 
-def get_state(self, game):
+
+# [danger_straight,danger_left,danger_right,
+# moving_left,moving_right,moving_up,moving_down,
+# food_left,food_right,food_up,food_down]
+def get_state_complex(self, game):
         head = game.snake[0]
-        point_l = Point(head.x - 20, head.y)
-        point_r = Point(head.x + 20, head.y)
-        point_u = Point(head.x, head.y - 20)
-        point_d = Point(head.x, head.y + 20)
+
+        ## w.r.t the direction of motion
+
+        left  = Point(head.x - 20, head.y)
+        right  = Point(head.x + 20, head.y)
+        up  = Point(head.x, head.y - 20)
+        down  = Point(head.x, head.y + 20)
         
         dir_l = game.direction == Direction.LEFT
         dir_r = game.direction == Direction.RIGHT
@@ -51,22 +74,22 @@ def get_state(self, game):
 
         state = [
             # Danger straight
-            (dir_r and game.is_collision(point_r)) or 
-            (dir_l and game.is_collision(point_l)) or 
-            (dir_u and game.is_collision(point_u)) or 
-            (dir_d and game.is_collision(point_d)),
+            (dir_r and game.is_collision(right)) or 
+            (dir_l and game.is_collision(left)) or 
+            (dir_u and game.is_collision(up)) or 
+            (dir_d and game.is_collision(down)),
 
             # Danger right
-            (dir_u and game.is_collision(point_r)) or 
-            (dir_d and game.is_collision(point_l)) or 
-            (dir_l and game.is_collision(point_u)) or 
-            (dir_r and game.is_collision(point_d)),
+            (dir_u and game.is_collision(right)) or 
+            (dir_d and game.is_collision(left)) or 
+            (dir_l and game.is_collision(up)) or 
+            (dir_r and game.is_collision(down)),
 
             # Danger left
-            (dir_d and game.is_collision(point_r)) or 
-            (dir_u and game.is_collision(point_l)) or 
-            (dir_r and game.is_collision(point_u)) or 
-            (dir_l and game.is_collision(point_d)),
+            (dir_d and game.is_collision(right)) or 
+            (dir_u and game.is_collision(left)) or 
+            (dir_r and game.is_collision(up)) or 
+            (dir_l and game.is_collision(down)),
             
             # Move direction
             dir_l,
@@ -83,8 +106,45 @@ def get_state(self, game):
 
         return np.array(state, dtype=int)
 
+
+## X SI Y SUNT INVERSATE  ??? 
+def get_state_easy(game):
+    return Point(int(game.head.x // BLOCK_SIZE),int(game.head.y // BLOCK_SIZE))
+
+'''
+Use a epsilon greedy alg to allow for exploration of new paths that at first seem not to get a good future reward
+
+return action
+[1,0,0] -> straight
+[0,1,0] -> right
+[0,0,1] -> left
+
+Take the best action 90% of times so epsilon is 0.9
+'''
+def get_action(epsilon,old_state):
+    # random moves: tradeoff exploration / exploitation
+
+    move = [0,0,0]
+
+    ## if qtable is empty for that state do a random action
+    if np.random.random() > epsilon or np.array_equal(qtable[old_state[0],old_state[1]],np.array([0,0,0])):
+         ## get random action
+        move_idx = random.randint(0, 2)
+        move[move_idx] = 1
+    else:
+        ## get the best action
+        ## should take the max of the array and make it 1
+        ## dar daca e negativ ?? sa iau in modul
+        print(np.argmax(qtable[old_state[0],old_state[1]]))
+        print(qtable[old_state[0],old_state[1]])
+
+        move[np.argmax(qtable[old_state[0],old_state[1]])] = 1
+
+    return move
+
+
 GAME = SnakeGame()
-EPISODES = 100
+EPISODES = 200
 qtable,rewards = prepare_enviroment(GAME)
 
 ## learning rate
@@ -93,16 +153,60 @@ alpha = 0.001
 ## discount rate is big because we want long term rewards
 gamma = 0.9  
 
+## percentage of time we take the best action considering the qtable
+epsilon = 0.9
+
 snake = GAME._get_snake_idxs()
 apple = GAME._get_food()
 
-## 32 * 24 and 3 actions
-##qtable = np.zeros((32,24,3))
-# qtable = np.zeros((768,3))
 
 
-## actions | 0 , 1 , 2
-actions = ['straight','left','right']
+iteration_for_plotting  = []
+score_for_plotting = []
+
+for i in range(EPISODES):
+    ## jocul abia a pornit la linia 107
+    game_over = False
+    GAME.reset()
+    while not game_over:
+
+        old_state = get_state_easy(GAME)
+        ## ? problema aici ?? 
+        action = get_action(epsilon,old_state)
+        reward,game_over,score = GAME.play_step(action)
+        new_state = get_state_easy(GAME)
+
+        (m,n,p) = np.shape(qtable)
+        
+        if new_state[0] == m or new_state[1] == n:
+            game_over = True
+            break
+
+        ## sau mai usor fac eu corelarea direct
+        '''
+            action == [1,0,0] -> 0 
+            action == [0,1,0] -> 1
+            action == [0,0,1] -> 2
+
+        '''
+
+        action_idx = 0 
+
+        if np.array_equal(action,np.array([1,0,0])):
+            action_idx = 0
+        elif np.array_equal(action,np.array([0,1,0])):
+            action_idx = 1
+        elif np.array_equal(action,np.array([0,0,1])):
+            action_idx = 2
+        else:
+            raise Exception()
 
 
-print(repr(rewards))
+        qtable[old_state[0],old_state[1],action_idx] += alpha * (reward + gamma * np.max(qtable[new_state[0],new_state[1]]) - qtable[old_state[0],old_state[1],action_idx])
+        
+    iteration_for_plotting += [i]
+    score_for_plotting += [score] 
+
+plot_score(iteration_for_plotting,score_for_plotting)
+
+    
