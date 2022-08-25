@@ -84,3 +84,5 @@ Varianta complexa:
 ## BUGS
 
 Cand da de marginea de sus creste in dimensiune aiurea ca si cum ar fi reward acolo
+Oare si capul sarpelui trebuie sa fie -10 ? 
+    Nu are sens ca nu are cum sa intre in propiul cap

@@ -27,7 +27,7 @@ BLACK = (0,0,0)
 GREEN = (75,224,80)
 
 BLOCK_SIZE = 20
-SPEED = 40
+SPEED = 10
 WINDOW_HEIGHT = 480
 WINDOW_WIDTH = 640
 
@@ -65,7 +65,12 @@ class SnakeGame:
         y = random.randint(0, (self.h-BLOCK_SIZE )//BLOCK_SIZE )*BLOCK_SIZE
         self.food = Point(x, y)
         ## SUNT INDEXATE DE LA 0 DAR X SI Y SUNT INVERS
-       
+        '''
+            Axa OX si OY sunt invers ca liniile si coloanele de la matrice
+            OX x -> coloana x
+            OY y -> linia y 
+
+        '''
         if self.food in self.snake:
             self._place_food()
 

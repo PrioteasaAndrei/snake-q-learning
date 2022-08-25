@@ -42,8 +42,10 @@ def prepare_enviroment(game):
     rewards = np.pad(rewards,pad_width=1,mode='constant',constant_values=-10)
 
     ## reward for apple
-
-    rewards[int(apple[0] // BLOCK_SIZE)][int(apple[1] // BLOCK_SIZE)] = 10
+    ## are they reverted ??/
+    x_OX =  int(apple[0] // BLOCK_SIZE)
+    y_OY = int(apple[1] // BLOCK_SIZE)
+    rewards[x_OX][y_OY] = 10
 
     ## make the snake tail -10
 
@@ -144,11 +146,11 @@ def get_action(epsilon,old_state):
 
 
 GAME = SnakeGame()
-EPISODES = 200
+EPISODES = 50
 qtable,rewards = prepare_enviroment(GAME)
 
 ## learning rate
-alpha = 0.001
+alpha = 0.5
 
 ## discount rate is big because we want long term rewards
 gamma = 0.9  
@@ -208,5 +210,5 @@ for i in range(EPISODES):
     score_for_plotting += [score] 
 
 plot_score(iteration_for_plotting,score_for_plotting)
-
+np.save('qtable.npy',qtable)
     
