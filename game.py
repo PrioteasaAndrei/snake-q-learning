@@ -22,9 +22,11 @@ RED = (200,0,0)
 BLUE1 = (0, 0, 255)
 BLUE2 = (0, 100, 255)
 BLACK = (0,0,0)
+YELLOW = (255,255,128)
 
 BLOCK_SIZE = 20
 SPEED = 40
+
 
 class SnakeGameAI:
 
@@ -35,6 +37,15 @@ class SnakeGameAI:
         self.display = pygame.display.set_mode((self.w, self.h))
         pygame.display.set_caption('Snake')
         self.clock = pygame.time.Clock()
+
+        self.obstacles = []
+        for i in range(10):
+            x = random.randint(0, (self.w-BLOCK_SIZE )//BLOCK_SIZE )*BLOCK_SIZE
+            y = random.randint(0, (self.h-BLOCK_SIZE )//BLOCK_SIZE )*BLOCK_SIZE
+
+            self.obstacles += [Point(x,y)]
+
+
         self.reset()
 
 
@@ -53,11 +64,12 @@ class SnakeGameAI:
         self.frame_iteration = 0
 
 
+
     def _place_food(self):
         x = random.randint(0, (self.w-BLOCK_SIZE )//BLOCK_SIZE )*BLOCK_SIZE
         y = random.randint(0, (self.h-BLOCK_SIZE )//BLOCK_SIZE )*BLOCK_SIZE
         self.food = Point(x, y)
-        if self.food in self.snake:
+        if self.food in self.snake or self.food in self.obstacles:
             self._place_food()
 
 
@@ -106,6 +118,9 @@ class SnakeGameAI:
         if pt in self.snake[1:]:
             return True
 
+        if pt in self.obstacles:
+            return True
+
         return False
 
 
@@ -115,6 +130,9 @@ class SnakeGameAI:
         for pt in self.snake:
             pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
             pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+4, pt.y+4, 12, 12))
+
+        for obs in self.obstacles:
+            pygame.draw.rect(self.display, YELLOW, pygame.Rect(obs.x, obs.y, BLOCK_SIZE, BLOCK_SIZE))
 
         pygame.draw.rect(self.display, RED, pygame.Rect(self.food.x, self.food.y, BLOCK_SIZE, BLOCK_SIZE))
 

@@ -10,6 +10,7 @@ class Linear_QNet(nn.Module):
         self.linear1 = nn.Linear(input_size, hidden_size)
         self.linear2 = nn.Linear(hidden_size, output_size)
 
+    ## relu = max(0,x)
     def forward(self, x):
         x = F.relu(self.linear1(x))
         x = self.linear2(x)
