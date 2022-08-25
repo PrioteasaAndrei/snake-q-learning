@@ -86,3 +86,9 @@ Varianta complexa:
 Cand da de marginea de sus creste in dimensiune aiurea ca si cum ar fi reward acolo
 Oare si capul sarpelui trebuie sa fie -10 ? 
     Nu are sens ca nu are cum sa intre in propiul cap
+
+Coordonate pygame -> matrice
+Starile daca pot fi pur si simplu patratelele sau trebuie ceva mai complex
+    merge sa fie si pur si simplu patratele
+
+Gresisei coordonatele ca dupa ce faci padding se modifica indexi

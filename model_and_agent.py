@@ -1,5 +1,4 @@
 
-from multiprocessing.spawn import prepare
 import matplotlib.pyplot as plt
 import numpy as np
 from game import BLOCK_SIZE, SnakeGame
@@ -33,25 +32,30 @@ def prepare_enviroment(game):
         raise Exception()
 
     ## 32 * 24 and 3 actions
-    qtable = np.zeros((32,24,3))
+    qtable = np.zeros((24,32,3))
     # qtable = np.zeros((768,3))
     
     ## rewards
     ## bigger by 2 set the bounderies equal to -10
-    rewards = np.zeros((32,24))
-    rewards = np.pad(rewards,pad_width=1,mode='constant',constant_values=-10)
+    rewards = np.zeros((24,32))
+
 
     ## reward for apple
     ## are they reverted ??/
     x_OX =  int(apple[0] // BLOCK_SIZE)
     y_OY = int(apple[1] // BLOCK_SIZE)
-    rewards[x_OX][y_OY] = 10
+    ## ASTA E COORDONATA FARA PADDING
+    rewards[y_OY][x_OX] = 10
 
     ## make the snake tail -10
 
+    ## am inversat si aici pentru ca x sunt coloanele si y liniile
+    ## SI ASTEA LA FEL FARA PADDING SUNT COORDONATELE
     for square in snake[1:]:
-        rewards[int(square[0] // BLOCK_SIZE)][int(square[1] // BLOCK_SIZE)] = -10
+        rewards[int(square[1] // BLOCK_SIZE)][int(square[0] // BLOCK_SIZE)] = -10
 
+
+    rewards = np.pad(rewards,pad_width=1,mode='constant',constant_values=-10)
     
     return qtable,rewards
 
@@ -110,8 +114,9 @@ def get_state_complex(self, game):
 
 
 ## X SI Y SUNT INVERSATE  ??? 
+## X e coloana y e linia
 def get_state_easy(game):
-    return Point(int(game.head.x // BLOCK_SIZE),int(game.head.y // BLOCK_SIZE))
+    return Point(int(game.head.y // BLOCK_SIZE),int(game.head.x // BLOCK_SIZE))
 
 '''
 Use a epsilon greedy alg to allow for exploration of new paths that at first seem not to get a good future reward
@@ -146,14 +151,14 @@ def get_action(epsilon,old_state):
 
 
 GAME = SnakeGame()
-EPISODES = 50
+EPISODES = 500
 qtable,rewards = prepare_enviroment(GAME)
 
 ## learning rate
 alpha = 0.5
 
 ## discount rate is big because we want long term rewards
-gamma = 0.9  
+gamma = 1.0  
 
 ## percentage of time we take the best action considering the qtable
 epsilon = 0.9
@@ -178,6 +183,7 @@ for i in range(EPISODES):
         reward,game_over,score = GAME.play_step(action)
         new_state = get_state_easy(GAME)
 
+        print("Reward is:",reward)
         (m,n,p) = np.shape(qtable)
         
         if new_state[0] == m or new_state[1] == n:

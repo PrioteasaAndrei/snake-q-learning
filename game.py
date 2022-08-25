@@ -26,8 +26,9 @@ BLUE2 = (0, 100, 255)
 BLACK = (0,0,0)
 GREEN = (75,224,80)
 
-BLOCK_SIZE = 20
-SPEED = 10
+## original block size: 20
+BLOCK_SIZE = 40
+SPEED = 80
 WINDOW_HEIGHT = 480
 WINDOW_WIDTH = 640
 
@@ -58,7 +59,12 @@ class SnakeGame:
         self._place_food()
         self.frame_iteration = 0
         self.games_played += 1
+       
 
+    def print_snake_info(self):
+        for item in self.snake:
+            print(item.x // BLOCK_SIZE,item.y // BLOCK_SIZE,"--")
+        print("0000000000000000000000000000000000000")
         
     def _place_food(self):
         x = random.randint(0, (self.w-BLOCK_SIZE )//BLOCK_SIZE )*BLOCK_SIZE 
@@ -71,6 +77,7 @@ class SnakeGame:
             OY y -> linia y 
 
         '''
+        print("x:",x // BLOCK_SIZE," y:",y // BLOCK_SIZE)
         if self.food in self.snake:
             self._place_food()
 
@@ -78,7 +85,7 @@ class SnakeGame:
         return self.food
         
     def play_step(self,action):
-
+        
         self.frame_iteration+=1
         # 1. collect user input
         for event in pygame.event.get():
