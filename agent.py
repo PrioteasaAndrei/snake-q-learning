@@ -16,11 +16,17 @@ class Agent:
         self.n_games = 0
         self.epsilon = 0 # randomness
         self.gamma = 0.9 # discount rate is big because we want long term gain
-        self.memory = deque(maxlen=MAX_MEMORY) # popleft()
+        self.memory = deque(maxlen=MAX_MEMORY) 
         self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
+    '''
+     state = 
+            [danger_straight,danger_left,danger_right,
+            moving_left,moving_right,moving_up,moving_down,
+            food_left,food_right,food_up,food_down]
 
+    '''
     def get_state(self, game):
         head = game.snake[0]
         point_l = Point(head.x - 20, head.y)
@@ -84,6 +90,15 @@ class Agent:
     def train_short_memory(self, state, action, reward, next_state, done):
         self.trainer.train_step(state, action, reward, next_state, done)
 
+
+    '''
+        Allow dynamic randomness as more games are played epsilon gets smaller, exploitation gets bigger
+
+        [1,0,0] -> straight
+        [0,1,0] -> right
+        [0,0,1] -> left
+
+    '''
     def get_action(self, state):
         # random moves: tradeoff exploration / exploitation
         self.epsilon = 80 - self.n_games

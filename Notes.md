@@ -92,3 +92,5 @@ Starile daca pot fi pur si simplu patratelele sau trebuie ceva mai complex
     merge sa fie si pur si simplu patratele
 
 Gresisei coordonatele ca dupa ce faci padding se modifica indexi
+
+Nu folosesti reward matrix-ul tau

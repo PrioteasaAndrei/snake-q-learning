@@ -3,6 +3,11 @@ from IPython import display
 
 plt.ion()
 
+'''
+    Helper function to dynamically plot #games_played and score
+
+'''
+
 def plot(scores, mean_scores):
     display.clear_output(wait=True)
     display.display(plt.gcf())
