@@ -32,7 +32,7 @@ def prepare_enviroment(game):
         raise Exception()
 
     ## 32 * 24 and 3 actions
-    qtable = np.zeros((24,32,3))
+    qtable = np.zeros((32,32,32,32,3))
     # qtable = np.zeros((768,3))
     
     ## rewards
@@ -118,6 +118,16 @@ def get_state_complex(self, game):
 def get_state_easy(game):
     return Point(int(game.head.y // BLOCK_SIZE),int(game.head.x // BLOCK_SIZE))
 
+def get_state_relative_to_apple(game):
+    head = game.snake[0]
+    apple = game.food
+    tail = game.snake[-1]
+
+    apple_relative = Point(apple.x - head.x, apple.y - head.y)
+    tail_relative = Point(tail.x - head.x, tail.y - head.y)
+
+    return np.array([int(apple_relative.y // BLOCK_SIZE),int(apple_relative.x // BLOCK_SIZE),int(tail_relative.y // BLOCK_SIZE),int(tail_relative.x // BLOCK_SIZE)])
+
 '''
 Use a epsilon greedy alg to allow for exploration of new paths that at first seem not to get a good future reward
 
@@ -134,7 +144,7 @@ def get_action(epsilon,old_state):
     move = [0,0,0]
 
     ## if qtable is empty for that state do a random action
-    if np.random.random() > epsilon or np.array_equal(qtable[old_state[0],old_state[1]],np.array([0,0,0])):
+    if np.random.random() > epsilon or np.array_equal(qtable[old_state[0],old_state[1],old_state[2],old_state[3]],np.array([0,0,0,0])):
          ## get random action
         move_idx = random.randint(0, 2)
         move[move_idx] = 1
