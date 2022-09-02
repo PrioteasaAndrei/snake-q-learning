@@ -15,14 +15,14 @@ Go left w.r.t direction of motion: [0,0,1]
 ## States
 
 Boolean array made of 11 elements:
-# Danger straight
-# Danger right w.r.t direction of motion
-# Danger left w.r.t direction of motion
-# 4 Move directions
-# food left of head
-# food right of head
-# food up of head
-# food down of head
+### Danger straight
+### Danger right w.r.t direction of motion
+### Danger left w.r.t direction of motion
+### 4 Move directions
+### food left of head
+### food right of head
+### food up of head
+### food down of head
 
 Qtable is a python dict with str(state) as key and a numpy array with 3 elements as value, a q value for each action
 
