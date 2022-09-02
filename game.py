@@ -8,7 +8,6 @@ import numpy as np
 
 pygame.init()
 font = pygame.font.Font('arial.ttf', 25)
-#font = pygame.font.SysFont('arial', 25)
 
 class Direction(Enum):
     RIGHT = 1
@@ -27,7 +26,7 @@ BLACK = (0,0,0)
 GREEN = (75,224,80)
 
 ## original block size: 20
-BLOCK_SIZE = 40
+BLOCK_SIZE = 20
 SPEED = 80
 WINDOW_HEIGHT = 480
 WINDOW_WIDTH = 640
@@ -98,17 +97,17 @@ class SnakeGame:
         self.snake.insert(0, self.head)
         
         # 3. check if game over
-        reward = 0
+        reward = -0.05
         game_over = False
         if self._is_collision() or self.frame_iteration > 100 * len(self.snake):
             game_over = True
-            reward = -10
+            reward = -1
             return reward,game_over, self.score
             
         # 4. place new food or just move
         if self.head == self.food:
             self.score += 1
-            reward = 10
+            reward = 1
             self._place_food()
         else:
             self.snake.pop()
@@ -133,7 +132,7 @@ class SnakeGame:
     
     def _get_snake_idxs(self):
         return self.snake
-        
+
     def _update_ui(self):
         self.display.fill(BLACK)
         self.drawGrid()
