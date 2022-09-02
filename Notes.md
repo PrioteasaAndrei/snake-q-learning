@@ -32,30 +32,6 @@ alpha = learning rate 0 <= alpha <= 1
 
 max Q(st+1, a) = maximum future reward than can be obtained from st+1
 
-## Q table
-
-Matrix of size(dim(state),dim(actions))
-
-For snake -> np.zeros((3,sizeof(table))
-
-States : WIDTH = 640 / 20 = 32
-         HEIGHT = 480 / 20 = 24
-
-#states = 32 * 24 = 768
-
-qtable[i][j] = Q(i,j) i- state , j - where
-0 <= qtable[i][j] <= 1
-
-### Rewards
-
-Eat apple = 10 p
-Die = -10 p or #steps > 100 * len(snake) -10p 
-    | no progress proportional with the length of the snake
-Move without hitting the wall or diying = 0p
-(i don't want the shortest path and don't want the snake to move forever to maximize reward)
-
-
-
 ### Moves
 
 straight, left and right w.r.t direction of movement
@@ -78,17 +54,3 @@ Varianta complexa:
             [danger_straight,danger_left,danger_right,
             moving_left,moving_right,moving_up,moving_down,
             food_left,food_right,food_up,food_down]
-
-
-
-## BUGS
-
-Cand da de marginea de sus creste in dimensiune aiurea ca si cum ar fi reward acolo
-Oare si capul sarpelui trebuie sa fie -10 ? 
-    Nu are sens ca nu are cum sa intre in propiul cap
-
-Coordonate pygame -> matrice
-Starile daca pot fi pur si simplu patratelele sau trebuie ceva mai complex
-    merge sa fie si pur si simplu patratele
-
-Gresisei coordonatele ca dupa ce faci padding se modifica indexi
