@@ -83,6 +83,7 @@ class SnakeGame:
     def _get_food(self):
         return self.food
         
+    ## let the reward be -0.05 for every movement that doesnt produce an apple or hit a wall
     def play_step(self,action):
         
         self.frame_iteration+=1
