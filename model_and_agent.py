@@ -11,6 +11,16 @@ from plotting import plot_score
 
 Point = namedtuple('Point', 'x, y')
 
+## learning rate
+alpha = 0.1
+
+## discount rate is big because we want long term rewards
+gamma = 0.9
+
+## percentage of time we take the best action considering the qtable
+epsilon = 1.0
+
+
 class Direction(Enum):
     RIGHT = 1
     LEFT = 2
@@ -188,14 +198,13 @@ return action
 
 Take the best action 90% of times so epsilon is 0.9
 '''
-def get_action(epsilon,old_state):
+def get_action(old_state,epoch):
     # random moves: tradeoff exploration / exploitation
-
     move = [0,0,0]
 
-    if np.random.random() > epsilon:
+    if np.random.random() < epsilon:
          ## get random action
-        print("HERERERER")
+        # print("HERERERER")
         move_idx = random.randint(0, 2)
         move[move_idx] = 1
     else:
@@ -217,17 +226,8 @@ def get_action(epsilon,old_state):
 
 
 GAME = SnakeGame()
-EPISODES = 150
+EPISODES = 500
 qtable,history = prepare_enviroment(GAME)
-
-## learning rate
-alpha = 0.1
-
-## discount rate is big because we want long term rewards
-gamma = 0.9
-
-## percentage of time we take the best action considering the qtable
-epsilon = 0.9
 
 iteration_for_plotting  = []
 score_for_plotting = []
@@ -236,10 +236,18 @@ for i in range(EPISODES):
     game_over = False
     GAME.reset()
     history = [] 
+
+    if i % 50 == 0:
+        epsilon -= 0.1
+        print("New epsilon is:",epsilon)
+
+    if epsilon < 0.0 :
+        epsilon = 0.0
+
     while not game_over:
 
         old_state = get_state(GAME)
-        action = get_action(epsilon,old_state)
+        action = get_action(old_state,i)
 
         reward,game_over,score = GAME.play_step(action)
 
@@ -252,12 +260,14 @@ for i in range(EPISODES):
 
         '''
         action_idx = action_to_index(action)
-        update_qtable(qtable,game_over)
+        qtable[str(old_state)][action_idx] += alpha * (reward + gamma * np.max(qtable[str(new_state)]) - qtable[str(old_state)][action_idx])
+
+        ##update_qtable(qtable,game_over)
 
     iteration_for_plotting += [i]
     score_for_plotting += [score] 
 
 
 plot_score(iteration_for_plotting,score_for_plotting)
-np.save('qtable.npy',qtable)
+# np.save('qtable.npy',qtable)
 
